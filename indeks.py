@@ -1,38 +1,5 @@
-"""
-Zadanie 3 - Indeksowanie dokumentów
-
-Opis zadania:
-- Wejście:
-    * Pierwsza linia: liczba dokumentów do przetworzenia (n).
-    * Kolejne n linii: dokumenty (każdy dokument to wielowyrazowy ciąg znaków).
-    * Następna linia: liczba zapytań (m).
-    * Kolejne m linii: zapytania (każdy zapytanie to pojedynczy wyraz).
-- Wyjście:
-    * m linii, z których każda zawiera listę numerów dokumentów, w których wystąpił wyraz z zapytania.
-    * Każda lista jest posortowana według częstości wystąpienia zapytania w danym dokumencie (od największej do najmniejszej).
-    * W przypadku równych częstości, lista może być posortowana malejąco wg numeru dokumentu (opcjonalnie).
-    * Jeśli słowo nie wystąpiło w żadnym dokumencie, zwróć pustą listę.
-
-Przykładowe wejście:
-    3
-    Your care set up, do not pluck my care down.
-    My care is loss of care with old care done.
-    Your care is gain of care when new care is won.
-    2
-    care
-    is
-
-Przykładowe wyjście:
-    [1, 2, 0]
-    [2, 1]
-
-Wymagania:
-- Implementacja funkcji `index_documents(documents: list[str], queries: list[str]) -> list[list[int]]`.
-- Przetwarzanie tekstu – można użyć podziału na wyrazy, ignorując interpunkcję i wielkość liter.
-- Obliczenie liczby wystąpień danego wyrazu w każdym dokumencie.
-- Dla każdego zapytania, zwrócenie posortowanej listy indeksów dokumentów.
-"""
-
+import re
+from collections import defaultdict
 
 def index_documents(documents: list[str], queries: list[str]) -> list[list[int]]:
     """
@@ -47,11 +14,35 @@ def index_documents(documents: list[str], queries: list[str]) -> list[list[int]]
     Returns:
         list[list[int]]: Lista wyników dla kolejnych zapytań.
     """
-    ### TUTAJ PODAJ ROZWIĄZANIE ZADANIA
+    # Normalizacja dokumentów: usunięcie interpunkcji i zamiana na małe litery
+    normalized_docs = [
+        re.findall(r'\b\w+\b', doc.lower()) for doc in documents
+    ]
 
-    ### return [[]] - powinno być zmienione i zwrócić prawdziwy wynik (zgodny z oczekiwaniami)
-    return [[]]
+    # Tworzenie indeksu odwrotnego: słowo -> {dokument: liczba wystąpień}
+    inverted_index = defaultdict(lambda: defaultdict(int))
+    for doc_id, words in enumerate(normalized_docs):
+        for word in words:
+            inverted_index[word][doc_id] += 1
 
+    # Przetwarzanie zapytań
+    results = []
+    for query in queries:
+        query = query.lower()
+        if query in inverted_index:
+            # Pobierz dokumenty i ich liczby wystąpień
+            doc_counts = inverted_index[query]
+            # Posortuj według liczby wystąpień (malejąco), a potem wg numeru dokumentu (malejąco)
+            sorted_docs = sorted(
+                doc_counts.keys(),
+                key=lambda doc_id: (-doc_counts[doc_id], -doc_id)
+            )
+            results.append(sorted_docs)
+        else:
+            # Jeśli słowo nie występuje w żadnym dokumencie, zwróć pustą listę
+            results.append([])
+
+    return results
 
 # Przykładowe wywołanie:
 if __name__ == "__main__":

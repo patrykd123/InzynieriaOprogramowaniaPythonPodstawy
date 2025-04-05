@@ -28,13 +28,17 @@ def verify_pesel(pesel: str) -> int:
     Returns:
         int: 1 jeśli numer jest poprawny, 0 jeśli nie.
     """
-    ### TUTAJ PODAJ ROZWIĄZANIE ZADANIA
+    weights = [1, 3, 7, 9, 1, 3, 7, 9, 1, 3]
+    total = 0
 
-    ### return 0 - powinno być zmienione i zwrócić prawdziwy wynik (zgodny z oczekiwaniami)
-    return 0
+    for i in range(10):
+        total += int(pesel[i]) * weights[i]
+
+    check_digit = (10 - (total % 10)) % 10
+    return 1 if check_digit == int(pesel[10]) else 0
 
 
 # Przykładowe wywołanie:
 if __name__ == "__main__":
-    pesel_input = "97082123152"
+    pesel_input = "00280401638"
     print(verify_pesel(pesel_input))  # Oczekiwane wyjście: 0
